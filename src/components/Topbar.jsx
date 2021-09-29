@@ -1,46 +1,68 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, {useContext} from "react";
+import { NavLink, useHistory } from "react-router-dom";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, get, child } from "firebase/database";
+import {getLocalStorage, removeLocalStorageKey, setLocalStorage} from '../utils/utils'
+import { localStorageKeys } from "../utils/constant";
+import { loginContext } from "../context/context";
 
 
 const auth = getAuth();
 var provider = new GoogleAuthProvider();
 const db = getDatabase();
+const dbRef = ref(getDatabase());
 
-function writeUserData(userId,data) {
-        set(ref(db, 'users/' + userId), {
-            userData: data,
-        });
-    }
-function click() {
-
-
-
-    signInWithPopup(auth, provider)
-        .then((result) => {
-
-            const user = result.user;
-            writeUserData(user.uid,{ id: user.uid, name: user.displayName, email: user.email, photoUrl : user.photoURL, token: user.accessToken, role : "viewer", isVerify : false, })
-            console.log("kjds", user)
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            // const credential = GoogleAuthProvider.credentialFromResult(result);
-           
-            // console.log( "credentials", credential);
-            console.log("result", user.uid);
-            // ...
-        }).catch((error) => {
-            // Handle Errors here.
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // The email of the user's account used.
-            const email = error.email;
-            // The AuthCredential type that was used.
-            const credential = GoogleAuthProvider.credentialFromError(error);
-            // ...
-        });
+function writeUserData(userId, data) {
+    set(ref(db, 'users/' + userId), {
+        userData: data,
+    });
 }
+
 const Topbar = () => {
+    const history = useHistory();
+    const {user, setUser,token, setToken} = useContext(loginContext);
+
+
+
+    function login() {
+
+        signInWithPopup(auth, provider)
+            .then((result) => {
+
+                const user = result.user;
+
+                get(child(dbRef, `users/${user.uid}`)).then((snapshot) => {
+
+                    if (snapshot.exists()) {
+                        const isVerification = snapshot.val().userData.isVerify;
+                        if (isVerification) {
+                            setLocalStorage(localStorageKeys.token, user.accessToken)
+                            setLocalStorage(localStorageKeys.user, {id : user.uid, email : user.email, name : user.name})
+
+                            history.replace("/work");
+
+                        } else {
+                            alert("Please Wait untill admin approve your requests")
+                            removeLocalStorageKey(localStorageKeys.token)
+                            removeLocalStorageKey(localStorageKeys.user)
+                        }
+                    } else {
+                        writeUserData(user.uid, { id: user.uid, name: user.displayName, email: user.email, photoUrl: user.photoURL, token: user.accessToken, superAdmin: false, isVerify: false, })
+                        alert("Please Wait untill admin approve your requests")
+                        
+                    }
+                        setToken(getLocalStorage(localStorageKeys.token))
+                        setUser(getLocalStorage(localStorageKeys.user))
+                }).catch((error) => {
+                    alert(error);
+                });
+
+            }).catch((error) => {
+                alert(error.code);
+
+            });
+    }
+
 
     return <>
         <div className="header">
@@ -50,7 +72,7 @@ const Topbar = () => {
                     <div style={{ width: 500 }} className="nav">
                         <ul className="d-flex justify-around">
                             <li><NavLink to="/">Home</NavLink></li>
-                            <li><button onClick={() => { click() }}>Login</button></li>
+                            <li><button onClick={() => { login() }}>Login</button></li>
                         </ul>
                     </div>
                 </div>
