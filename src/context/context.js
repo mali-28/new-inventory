@@ -1,4 +1,4 @@
-import { getDatabase, ref, child, get, onChildAdded, } from "firebase/database";
+import { getDatabase, ref, child, get, onChildAdded, onChildChanged} from "firebase/database";
 import React, { createContext, useEffect, useState } from "react";
 import { getLocalStorage } from "../utils/utils";
 import { localStorageKeys } from "../utils/constant";
@@ -6,18 +6,14 @@ const loginContext = createContext({
     token: "",
     user: "",
     showData: "",
-    userLocation: "",
-    isDonor: "",
     pendingData : [],
     approvedData : [],
     setToken: () => {},
     setUser: () => {},
     setShowData: () => {},
-    setUserLocation: () => {},
-    removeItem: () => {},
-    setIsDonor: () => {},
-    setArrayData : () =>{},
-    display : () => {}
+    setPendingData: () => {},
+    setApprovedData: () => {},
+    database : () =>{}
 });
 
 const Context = (props) => {
@@ -25,12 +21,9 @@ const Context = (props) => {
 
         const [token, setToken] = useState(getLocalStorage(localStorageKeys.token));
         const [user, setUser] = useState(getLocalStorage(localStorageKeys.user) || {});
-    //     const [userLocation, setUserLocation] = useState(getLocalStorage("location") || [])
-    //     const [isDonor, setIsDonor] = useState(false)
         const [showData, setShowData] = useState({});
         const [pendingData, setPendingData] = useState([]);
         const [approvedData, setApprovedData] = useState([]);
-
 
 
         const database =  () =>{
@@ -58,21 +51,20 @@ const Context = (props) => {
 
         useEffect(() => {
 
-    //         const token = getLocalStorage("Islogin");
+            const token = getLocalStorage(localStorageKeys.token);
             const db = getDatabase();
-    //         setLogin(token);
+            setLogin(token);
 
-    //         onChildChanged(ref(db, '/users'), (snapshot) => {
-    //             if (snapshot.exists()) {
-    //                 const updatedData =  snapshot.val();
-    //                 setShowData((pre)=> {
-    //                     return {...pre, [updatedData.userData.id] : updatedData}
-    //                 })
-    //             } else {
-    //                 console.log("No data available");
-    //             }
-    //             // ...
-    //         });
+            onChildChanged(ref(db, '/users'), (snapshot) => {
+                if (snapshot.exists()) {
+                    const updatedData =  snapshot.val();
+                    setShowData((pre)=> {
+                        return {...pre, [updatedData.userData.id] : updatedData}
+                    })
+                } else {
+                    console.log("No data available");
+                }
+            });
 
             onChildAdded(ref(db, '/users'), (snapshot) => {
                 if (snapshot.exists()) {
@@ -80,6 +72,8 @@ const Context = (props) => {
                     setShowData((pre)=> {
                         return {...pre, [newData.userData.id] : newData}
                     })
+                    pendingData.unshift(newData);
+
                 } else {
                     console.log("No data available");
 

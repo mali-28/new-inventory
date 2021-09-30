@@ -1,18 +1,18 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { getDatabase, ref, set, get, child } from "firebase/database";
-import {getLocalStorage, removeLocalStorageKey, setLocalStorage} from '../utils/utils'
+import { getLocalStorage, removeLocalStorageKey, setLocalStorage } from '../utils/utils'
 import { localStorageKeys } from "../utils/constant";
 import { loginContext } from "../context/context";
 
 
 const auth = getAuth();
-var provider = new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 const db = getDatabase();
 const dbRef = ref(getDatabase());
 
-function writeUserData(userId, data) {
+const  writeUserData = (userId, data) =>{
     set(ref(db, 'users/' + userId), {
         userData: data,
     });
@@ -20,9 +20,9 @@ function writeUserData(userId, data) {
 
 const Topbar = () => {
     const history = useHistory();
-    const {user, setUser,token, setToken} = useContext(loginContext);
+    const {showData,user, setUser, token, setToken } = useContext(loginContext);
 
-
+    
 
     function login() {
 
@@ -37,7 +37,7 @@ const Topbar = () => {
                         const isVerification = snapshot.val().userData.isVerify;
                         if (isVerification) {
                             setLocalStorage(localStorageKeys.token, user.accessToken)
-                            setLocalStorage(localStorageKeys.user, {id : user.uid, email : user.email, name : user.name})
+                            setLocalStorage(localStorageKeys.user, { id: user.uid, email: user.email, name: user.name })
 
                             history.replace("/work");
 
@@ -49,10 +49,10 @@ const Topbar = () => {
                     } else {
                         writeUserData(user.uid, { id: user.uid, name: user.displayName, email: user.email, photoUrl: user.photoURL, token: user.accessToken, superAdmin: false, isVerify: false, })
                         alert("Please Wait untill admin approve your requests")
-                        
+
                     }
-                        setToken(getLocalStorage(localStorageKeys.token))
-                        setUser(getLocalStorage(localStorageKeys.user))
+                    setToken(getLocalStorage(localStorageKeys.token))
+                    setUser(getLocalStorage(localStorageKeys.user))
                 }).catch((error) => {
                     alert(error);
                 });
@@ -63,7 +63,6 @@ const Topbar = () => {
             });
     }
 
-
     return <>
         <div className="header">
             <div className="container">
@@ -72,7 +71,14 @@ const Topbar = () => {
                     <div style={{ width: 500 }} className="nav">
                         <ul className="d-flex justify-around">
                             <li><NavLink to="/">Home</NavLink></li>
+                             {showData[user.id]?.userData.superAdmin ? 
+                             <>
+                             <li><button onClick={() => { login() }}>Login</button></li>
+                             <li><NavLink to="/accounts">Accounts</NavLink></li>
+                             </>: 
+                             
                             <li><button onClick={() => { login() }}>Login</button></li>
+                             }
                         </ul>
                     </div>
                 </div>
