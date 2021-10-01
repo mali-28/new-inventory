@@ -13,46 +13,34 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { loginContext } from "../../context/context";
+import UserTable from "../../components/UserTable";
 
 const Accounts = () =>{
-    const dbRef = ref(getDatabase());
-    const db = getDatabase()
-    const  writeUserData = (userId, data) =>{
-
-        set(ref(db, 'users/' + userId), {
-            userData: data,
-        });
+  const dbRef = ref(getDatabase());
+  const [value, setValue] = React.useState(1);
+  const {writeUserData,showData} = useContext(loginContext);
+  const useStyles = makeStyles({
+    table: {
+      minWidth: 650,
     }
-    const useStyles = makeStyles({
-        table: {
-          minWidth: 650,
-        }
-      });
-      
-      const classes = useStyles();
-    const [value, setValue] = React.useState(1);
-    const {showData,pendingData, approvedData} = useContext(loginContext);
-    const handleChange = (event, newValue) => {
-      setValue(newValue);
-    };
-//   console.log("pe", pendingData, "a", approvedData)
-  const handleVerification = (id) =>{
+  });
+  const classes = useStyles();
 
+  const handleChange = (event, newValue) => {
+  setValue(newValue);
+  };
+
+  const handleVerification = (id) =>{
     get(child(dbRef, `users/${id}`)).then((snapshot) => {
         if (snapshot.exists()) {
             const user = snapshot.val().userData;
-          console.log("update",snapshot.val());
           writeUserData(id, {...user, isVerify: !(user.isVerify)})
-
-          
         } else {
           console.log("No data available");
         }
       }).catch((error) => {
         console.error(error);
-      });
-   
-    
+      });  
 
   }
     return (
@@ -76,27 +64,21 @@ const Accounts = () =>{
             </TableRow>
           </TableHead>
           <TableBody>
-            {value ? (approvedData?.map((val) => (
-              <TableRow key={val.name}>
-                <TableCell component="th" scope="row">
-                  {val.name}
-                </TableCell>
-                <TableCell align="center">{val.email}</TableCell>
-                <TableCell align="center">{val.id}</TableCell>
-                <TableCell align="center">{val.isVerify? "true" : "false"}</TableCell>
-                <TableCell align="center"><button onClick={()=>{handleVerification(val.id)}}>Demote</button></TableCell>
-              </TableRow>
-            ))): (pendingData?.map((val) => (
-                <TableRow key={val.name}>
-                <TableCell component="th" scope="row">
-                  {val.name}
-                </TableCell>
-                <TableCell align="center">{val.email}</TableCell>
-                <TableCell align="center">{val.id}</TableCell>
-                <TableCell align="center">{val.isVerify? "true" : "false"}</TableCell>
-                <TableCell align="center"><button onClick={()=>{handleVerification(val.id)}}>Promote</button></TableCell>
-              </TableRow>
-              )))}
+            {value? Object.values(showData)?.map((val)=>{
+              if(val.userData.isVerify){
+                  return <UserTable title="Demote" val={val} onClick={()=>{handleVerification(val.userData.id)}}/>
+                }
+
+              }) 
+              : 
+              Object.values(showData)?.map((val)=>{
+                if(!val.userData.isVerify){
+                    return <UserTable title="Promote" val={val} onClick={()=>{handleVerification(val.userData.id)}}/>
+                  }
+                  
+                })
+              }
+           
           </TableBody>
         </Table>
       </TableContainer>

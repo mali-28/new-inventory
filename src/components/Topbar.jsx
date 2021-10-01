@@ -9,18 +9,11 @@ import { loginContext } from "../context/context";
 
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
-const db = getDatabase();
 const dbRef = ref(getDatabase());
-
-const  writeUserData = (userId, data) =>{
-    set(ref(db, 'users/' + userId), {
-        userData: data,
-    });
-}
 
 const Topbar = () => {
     const history = useHistory();
-    const {showData,user, setUser, token, setToken } = useContext(loginContext);
+    const {writeUserData,showData,user, setUser, token, setToken } = useContext(loginContext);
 
     
 
@@ -40,7 +33,6 @@ const Topbar = () => {
                             setLocalStorage(localStorageKeys.user, { id: user.uid, email: user.email, name: user.name })
 
                             history.replace("/work");
-
                         } else {
                             alert("Please Wait untill admin approve your requests")
                             removeLocalStorageKey(localStorageKeys.token)

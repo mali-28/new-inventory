@@ -1,4 +1,4 @@
-import { getDatabase, ref, child, get, onChildAdded, onChildChanged} from "firebase/database";
+import {writeUserData, getDatabase, ref, child,set, get, onChildAdded, onChildChanged} from "firebase/database";
 import React, { createContext, useEffect, useState } from "react";
 import { getLocalStorage } from "../utils/utils";
 import { localStorageKeys } from "../utils/constant";
@@ -13,18 +13,25 @@ const loginContext = createContext({
     setShowData: () => {},
     setPendingData: () => {},
     setApprovedData: () => {},
-    database : () =>{}
+    database : () =>{},
+    writeUserData : ()=>{}
 });
 
 const Context = (props) => {
-
 
         const [token, setToken] = useState(getLocalStorage(localStorageKeys.token));
         const [user, setUser] = useState(getLocalStorage(localStorageKeys.user) || {});
         const [showData, setShowData] = useState({});
         const [pendingData, setPendingData] = useState([]);
         const [approvedData, setApprovedData] = useState([]);
+        const db = getDatabase();
 
+        const  writeUserData = (userId, data) =>{
+    
+            set(ref(db, 'users/' + userId), {
+              userData: data,
+            });
+          }
 
         const database =  () =>{
             const dbRef = ref(getDatabase());
@@ -32,7 +39,6 @@ const Context = (props) => {
                 if (snapshot.exists()) {
                     const snaps = snapshot.val();
                     setShowData(snaps)
-                    console.log("snaps",Object.values(snaps))
                     Object.values(snaps)?.forEach((val)=>{
                         if(val.userData.isVerify){
                               setApprovedData(Object.values(val));
@@ -52,8 +58,7 @@ const Context = (props) => {
         useEffect(() => {
 
             const token = getLocalStorage(localStorageKeys.token);
-            const db = getDatabase();
-            setLogin(token);
+            setToken(token);
 
             onChildChanged(ref(db, '/users'), (snapshot) => {
                 if (snapshot.exists()) {
@@ -61,6 +66,8 @@ const Context = (props) => {
                     setShowData((pre)=> {
                         return {...pre, [updatedData.userData.id] : updatedData}
                     })
+
+                    
                 } else {
                     console.log("No data available");
                 }
@@ -99,7 +106,7 @@ const Context = (props) => {
 
 
     return <>
-        <loginContext.Provider value={{database,showData,pendingData,approvedData,user, setUser, token, setToken}}>
+        <loginContext.Provider value={{writeUserData,database,showData,setShowData,pendingData,approvedData,user, setUser, token, setToken}}>
             {props.children}
         </loginContext.Provider>
     </>
