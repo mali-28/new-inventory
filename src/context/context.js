@@ -14,25 +14,26 @@ const loginContext = createContext({
     setPendingData: () => {},
     setApprovedData: () => {},
     database : () =>{},
-    writeUserData : ()=>{}
+    writeUserData : ()=>{},
+
 });
 
 const Context = (props) => {
 
-        const [token, setToken] = useState(getLocalStorage(localStorageKeys.token));
-        const [user, setUser] = useState(getLocalStorage(localStorageKeys.user) || {});
+        const [token, setToken] = useState(getLocalStorage(localStorageKeys.token) || "");
+        const [user, setUser] = useState(getLocalStorage(localStorageKeys.user) || null);
         const [showData, setShowData] = useState({});
         const [pendingData, setPendingData] = useState([]);
         const [approvedData, setApprovedData] = useState([]);
         const db = getDatabase();
 
-        const  writeUserData = (userId, data) =>{
-    
-            set(ref(db, 'users/' + userId), {
-              userData: data,
+        const  writeUserData = (title,userId, data) =>{
+            set(ref(db, `${title}/` + userId), {
+              ...data
             });
           }
 
+          
         const database =  () =>{
             const dbRef = ref(getDatabase());
             get(child(dbRef, `users`)).then((snapshot) => {
@@ -40,7 +41,7 @@ const Context = (props) => {
                     const snaps = snapshot.val();
                     setShowData(snaps)
                     Object.values(snaps)?.forEach((val)=>{
-                        if(val.userData.isVerify){
+                        if(val.isVerify){
                               setApprovedData(Object.values(val));
                         }else{
                             setPendingData(Object.values(val));
@@ -54,7 +55,6 @@ const Context = (props) => {
             })
 
         }
-
         useEffect(() => {
 
             const token = getLocalStorage(localStorageKeys.token);
@@ -64,10 +64,9 @@ const Context = (props) => {
                 if (snapshot.exists()) {
                     const updatedData =  snapshot.val();
                     setShowData((pre)=> {
-                        return {...pre, [updatedData.userData.id] : updatedData}
+                        return {...pre, [updatedData.id] : updatedData}
                     })
 
-                    
                 } else {
                     console.log("No data available");
                 }
@@ -77,7 +76,7 @@ const Context = (props) => {
                 if (snapshot.exists()) {
                     const newData =  snapshot.val();
                     setShowData((pre)=> {
-                        return {...pre, [newData.userData.id] : newData}
+                        return {...pre, [newData.id] : newData}
                     })
                     pendingData.unshift(newData);
 
@@ -91,13 +90,7 @@ const Context = (props) => {
         }, [])
 
 
-    //     const removeItem = (key) =>{
-    //         const gdb = ref(getDatabase());
-    //         remove(child(gdb, `users/${key}`))
 
-            // database();
-    //         setIsDonor(false);
-    //     }
 
         useEffect(() => {
 

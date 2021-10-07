@@ -171,6 +171,9 @@ code {
 .success{
   color: #41C379;
 }
+.red{
+  color : red;
+}
 /* background */
 
 /* flex */

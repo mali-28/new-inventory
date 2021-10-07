@@ -3,16 +3,15 @@ import TableRow from "@material-ui/core/TableRow";
 
 const UserTable = ({val, ...props}) =>{
     return<>
-    <TableRow key={val.userData.id}>
+    <TableRow key={val.id}>
                 <TableCell component="th" scope="row">
-                  {val.userData.name}
+                  {val.name}
                 </TableCell>
-                <TableCell align="center">{val.userData.email}</TableCell>
-                <TableCell align="center">{val.userData.id}</TableCell>
-                <TableCell align="center">{val.userData.isVerify? "true" : "false"}</TableCell>
+                <TableCell align="center">{val.email}</TableCell>
+                <TableCell align="center">{val.id}</TableCell>
+                <TableCell align="center">{val.isVerify? "true" : "false"}</TableCell>
                 <TableCell align="center"><button onClick={props.onClick}>{props.title}</button></TableCell>
               </TableRow>
     </>
 }
-
 export default UserTable;

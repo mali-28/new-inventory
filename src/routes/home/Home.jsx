@@ -1,7 +1,6 @@
 import "./home.css";
 
 const Home =  () =>{
-  console.log("dkjxm")
     return <>
     <div className="mt-7 row3">
   <section className="hoc container clear"> 
