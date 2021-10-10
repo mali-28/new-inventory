@@ -174,7 +174,7 @@ const WorkContext = (props) => {
     }
     }
 
-console.log("setSubSells", subSells)
+// console.log("setSubSells", subSells)
 useEffect(() => {
     subStocksManage();
     

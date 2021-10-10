@@ -13,6 +13,7 @@ import Stores from "../components/Stores";
 import Stock from "../components/Stock";
 import SubStock from "../components/SubStock";
 import Sell from "../components/Sell";
+import Graph from "../components/Graph";
 import { getLocalStorage, removeLocalStorageKey, setLocalStorage } from '../utils/utils';
 import { localStorageKeys } from "../utils/constant";
 
@@ -48,6 +49,7 @@ const Work = () => {
                         <Tab label="Stock" value="stock" />
                         <Tab label="Sub-Stocks" value="subStocks" />
                         <Tab label="Sell-Details" value="sellDetails" />
+                        <Tab label="Graph" value="graph" />
                     </TabList>
 
                 </Box>
@@ -73,6 +75,10 @@ const Work = () => {
 
                 <TabPanel value="sellDetails"  style={{margin: "0 auto", textAlign: "center" }}>
                     <Sell user={user} classes={classes}/>
+                </TabPanel>
+
+                <TabPanel value="graph"  style={{margin: "0 auto", textAlign: "center" }}>
+                    <Graph/>
                 </TabPanel>
             </TabContext>
         </Box>

@@ -40,8 +40,8 @@ const Sell = (props) => {
     // console.log("sellInputData", subSellData)
     useEffect(() => {
         let changeStock = [];
-        console.log("sellsubDetial", subStocks)
-        console.log("sellstoreName", sellStoreName)
+        // console.log("sellsubDetial", subStocks)
+        // console.log("sellstoreName", sellStoreName)
         Object.values(subStocks)?.forEach((val) => {
             // console.log("sellVal",val)
             if (val.storeName === sellStoreName) {
@@ -240,7 +240,7 @@ console.log("remain", remiainingQunatity)
                                     remove = {()=>{removeSell(val.id)}} 
                                     val={val}
                                 />
-
+                                
                             }
                         })
                         }
