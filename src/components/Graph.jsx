@@ -30,7 +30,7 @@ const Graph = () => {
             const monthName = monthNames[Number(splitDate[0])-1]
             const monthYear = [monthName, splitDate[2]].join();
             obj.push({ ...val, date: monthYear, quantity: Number(val.quantity) })
-            console.log("objGraph", obj)
+            // console.log("objGraph", JSON.stringify(obj))
         })
 
         for (let i = 0; i < obj?.length; i++) {

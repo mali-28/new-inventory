@@ -28,7 +28,7 @@ const Sell = (props) => {
     const [preQuantity, setPreQuantity] = useState(0);
     const [cond, setCond] = useState(true);
     const [subSellData, setSubSellData] = React.useState({
-        store: "Store Closed",
+        store: "",
         name: "",
         quantity: 0,
         date: new Date().toLocaleDateString(),
@@ -36,20 +36,18 @@ const Sell = (props) => {
 
     });
 
-    //     console.log("sell",subSells)
-    // console.log("sellInputData", subSellData)
+    // console.log("sellstore", sellStoreName)
+    // console.log("subSellData",subSellData)
+    // console.log("sellinputstore", storeInfo[subSellData.store]?.store)
+
     useEffect(() => {
         let changeStock = [];
-        // console.log("sellsubDetial", subStocks)
-        // console.log("sellstoreName", sellStoreName)
         Object.values(subStocks)?.forEach((val) => {
-            // console.log("sellVal",val)
             if (val.storeName === sellStoreName) {
                 changeStock.push(val)
             }
         })
 
-        // console.log("changeStock", changeStock)
         setStoretock(changeStock)
 
         setSubSellData((pre) => {
@@ -64,6 +62,7 @@ const Sell = (props) => {
         setSubSellData((pre) => {
             return { ...pre, store: Object.values(storeInfo)?.[0]?.id }
         })
+        setSellStoreName(Object.values(storeInfo)?.[0]?.store)
     }, [storeInfo])
 
     const subSellEvent = (event) => {
@@ -96,7 +95,6 @@ const Sell = (props) => {
             const remiainingQunatity = Number(productDetail.quantity) - Number(subSellData.quantity);
             const uid = `${user.id}_${new Date().getTime()}`;
 
-console.log("remain", remiainingQunatity)
         if (remiainingQunatity < 0) {
             alert(`Available quantity of ${productDetail.productName} are ${Number(productDetail.quantity)}`)
 
@@ -136,23 +134,20 @@ console.log("remain", remiainingQunatity)
     }
     const updateSell = (key) => {
         setCond(false);
-        console.log("sell", subSells)
-        console.log("kew", key)
         const value = subSells[key];
-        console.log("val", value)
+        console.log("value", value)
+        console.log("input", subSellData)
+        setPreQuantity(value.quantity)
         setSubSellData((pre) => {
-            setPreQuantity(value.quantity)
-            return { ...pre, ...value }
+            console.log({...pre, ...value })
+            return {...pre, ...value }
         });
         setSellStoreName(value.storeName)
 
 
     }
 
-    // console.log("state", subSellData)
     const removeSell = (key) =>{
-        console.log("key",key)
-        console.log("sellstoreNameremove", sellStoreName)
         remove(child(dbRef, `stocks/${sellStoreName}/${key}`));
         setSubSells((pre) => {
             const preVal = { ...pre }

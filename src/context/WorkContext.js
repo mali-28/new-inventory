@@ -174,7 +174,6 @@ const WorkContext = (props) => {
     }
     }
 
-// console.log("setSubSells", subSells)
 useEffect(() => {
     subStocksManage();
     
@@ -265,10 +264,7 @@ useEffect(() => {
         AllSells();
     }, [])
 
-    useEffect(() => {
-        setStockStoreName(() => { return Object.values(storeInfo)?.[0]?.store })
-        setSellStoreName(() => { return Object.values(storeInfo)?.[0]?.store })
-    }, [storeInfo])
+    
 
     return <>
         <AdminContext.Provider value={{ writeData, purchaseInfo, setPurchaseInfo, storeInfo, setStoreInfo, stockInfo, setStockInfo, stockData,stockStoreName, setStockStoreName,sellStoreName, setSellStoreName, subStocks, setSubStocks, subSells, setSubSells,setDidAddKey }}>

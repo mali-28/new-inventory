@@ -34,6 +34,9 @@ const SubStock = (props) => {
         id: "",
 
     });
+// console.log("store", stockStoreName)
+//     console.log("subStoreData",subStoreData)
+//     console.log("inputstore", storeInfo[subStoreData.store]?.store)
     useEffect(() => {
         setSubStoreData((pre) => {
             return { ...pre, name: Object.values(stockInfo)?.[0]?.id }
@@ -45,7 +48,7 @@ const SubStock = (props) => {
             return { ...pre, store: Object.values(storeInfo)?.[0]?.id }
         })
 
-        // setStockStoreName(Object.values(storeInfo)?.[0]?.id)
+        setStockStoreName(Object.values(storeInfo)?.[0]?.store)
 
     }, [storeInfo])
 
@@ -97,7 +100,6 @@ const SubStock = (props) => {
             else {
                 setDidAddKey(true)
 
-                console.log("substoreid", subStoreData.id)
                 set(ref(db, `stock/` + productId), {
                     ...productDetail, quantity: remiainingQunatity
                 });
@@ -129,8 +131,6 @@ const SubStock = (props) => {
 
     }
     const removeStock = (key) => {
-        console.log("key", key)
-        console.log("stockstoreNameremove", stockStoreName)
         remove(child(dbRef, `stocks/${stockStoreName}/${key}`));
         setSubStocks((pre) => {
             const preVal = { ...pre }
